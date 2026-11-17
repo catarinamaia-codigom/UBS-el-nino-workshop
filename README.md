@@ -1,102 +1,91 @@
-# El Niño é pauta de saúde · Escuta da UBS + Painel do workshop
+# El Niño é pauta de saúde · Escuta da USF, painel, tópicos e Roteiro do Workshop
 
-**UBS conhece. A UPE apoia.**
+**Não tem resposta errada. Nós é que queremos consertar a forma de criar conhecimento. Vocês conhecem, a UPE facilita.**
 
-Formulário anônimo para a equipe da UBS e painel que transforma as respostas na base do workshop de cocriação sobre calor, El Niño e saúde. Segue a mesma arquitetura da pesquisa territorial do Córrego da Bica: um único `index.html` que roda **ao mesmo tempo** no GitHub Pages e no Google Apps Script e grava tudo na **mesma planilha**.
+Formulário de escuta das equipes de Saúde da Família do Recife, com painel para a coordenação, banco de tópicos sobre El Niño e saúde e geração automática do Roteiro do Workshop com Material Diagnóstico. Segue a arquitetura da pesquisa do Córrego da Bica: um único `index.html` que roda no GitHub Pages e no Google Apps Script e grava tudo numa planilha Google, que é o banco de dados.
 
 ```
 GitHub Pages (index.html) ──fetch──┐
-                                   ├──► Apps Script (apps-script/*.gs) ──► Planilha Google (respostas)
-Apps Script /exec (mesmo HTML) ────┘        validação, login do painel, auditoria
+                                   ├──► Apps Script (apps-script/Codigo.gs) ──► Planilha-banco (Google Sheets)
+Apps Script /exec (mesmo HTML) ────┘                                         └─► Pasta do Drive (arquivos enviados)
 ```
 
-- **Formulário:** https://catarinamaia-codigom.github.io/UBS-el-nino-workshop/
-- **Painel:** o mesmo endereço com `#painel` no final (ou o botão *Área da equipe UPE*).
-- Enquanto o servidor não estiver conectado, tudo funciona em **modo demonstração**: o formulário guarda as respostas no próprio aparelho e o painel abre com dados fictícios. Serve para apresentar a proposta à gestão.
+- **Formulário:** https://catarinamaia-codigom.github.io/UBS-el-nino-workshop/ (para uma unidade: `?ubs=USF%20Nome`)
+- **Coordenação:** ícone de usuário no topo → login → Painel, Tópicos, Roteiro e (para administradores) Montagem.
+- **Material geral público dos tópicos:** `?topicos=1`
+- **Material Diagnóstico publicado para uma equipe:** `?diagnostico=<código>` (gerado na aba Roteiro)
+- Sem o servidor conectado, tudo funciona em **modo demonstração** (dados fictícios, nada gravado na planilha).
 
-## Como o formulário está organizado
+## O formulário (edição 1)
 
-As etapas seguem a lógica da proposta (*o formulário não é burocracia, é estratégia*): perguntas que comparam **conhecimento declarado × realidade da UBS**.
+| Etapa | Conteúdo |
+|---|---|
+| **Começo** | nome da USF (já preenchido quando o link traz `?ubs=`), função, tempo na unidade e, em **estrelas**, o quanto a pessoa se sente preocupada com seus pacientes e usuários |
+| **1. Escutar** | familiaridade e segurança declaradas (escala 1–5) |
+| **2. Diagnosticar** | material e treinamento recebidos, fluxo da unidade, alertas |
+| **3. Verificar** | agravos percebidos, grupos e barreiras do território, situações concretas (pares *declarado × realidade*), relatos |
+| **4. Direcionar** | temas, materiais, linguagem, canais e formato do encontro |
+| **5. Cocriar** | link de site ou matéria, **envio de arquivo** (até 3, 10 MB), **pergunta para a equipe UPE pesquisar** e um pedido ao workshop |
 
-| Etapa | Para quê | Perguntas |
-|---|---|---|
-| **Quem responde** | agrupar sem identificar | função na UBS · tempo nesta UBS |
-| **1. Escutar** | o que a equipe diz que conhece | familiaridade com El Niño · efeitos do calor em geral · impactos na população da UBS · segurança para reconhecer agravos · para orientar · para indicar UBS × UPA/SAMU (escala 1–5) |
-| **2. Diagnosticar** | o que já existe de material e fluxo | já recebeu material/treinamento · de onde veio · se ajuda no território · fluxo para casos de calor · material para usuários · aviso de onda de calor |
-| **3. Verificar** | o que muda no contexto da UBS | agravos percebidos · grupos que mais preocupam (até 3) · barreiras do território (até 3) · 3 situações concretas em escala 1–5 · orientações que não funcionam · situação real (textos opcionais) |
-| **4. Direcionar** | o que vira workshop e material | temas prioritários (até 3) · materiais mais úteis (até 3) · linguagem (até 2) · canais (até 3) · formato do encontro · um pedido ao workshop |
+**Versão DEMO para validação:** com `MODO_VALIDACAO = sim` (aba Parametros ou botão na Montagem), cada pergunta e cada etapa ganha um **balão de comentário**. A coordenadora responde, comenta e as respostas dessa fase ficam marcadas como `validacao` (o painel não as conta, a menos que se peça). Os comentários aparecem na Montagem para serem resolvidos.
 
-Cerca de 25 perguntas, ~7 minutos. Sem nome, e-mail ou telefone. O rascunho fica salvo no aparelho até o envio; sem internet, a resposta fica guardada e é enviada sozinha quando a conexão volta.
+## Montagem do questionário (administração)
 
-**Pares declarado × realidade** (o coração da etapa *Verificar*):
+Editar texto, ajuda, rótulo do painel, obrigatoriedade, alternativas (incluir, renomear, reordenar, arquivar), máximo de escolhas, condição de exibição, pares *declarado × realidade*, ordem das perguntas e das etapas, novas perguntas e novas etapas. Há pré-visualização antes de publicar.
 
-| Par | Pergunta geral (etapa 1) | Pergunta no contexto (etapa 3) |
-|---|---|---|
-| Conhecer os efeitos do calor | efeitos do calor na saúde, em geral | impactos na população da SUA UBS |
-| Reconhecer agravos | segurança para reconhecer agravos | perceber piora de crônicos pelo calor nas visitas |
-| Orientar o usuário | orientar sobre proteção ao calor | orientar família com casa quente e falta d'água |
-| Decidir entre UBS e UPA/SAMU | dizer quando ir a cada serviço | idoso com tontura e confusão num dia quente |
+**Nada que já foi publicado se perde** (mesma premissa da pesquisa do Córrego da Bica):
+- códigos de perguntas e alternativas são permanentes;
+- o que sai do formulário é **arquivado**: some para quem responde, mas continua no painel e na planilha; o servidor recoloca, arquivado, qualquer pergunta ou alternativa que falte;
+- o tipo de uma pergunta publicada não muda (arquive e crie outra);
+- cada publicação é uma nova edição (aba `Versoes`) com o histórico do que mudou (aba `Historico_Questionario`); cada resposta grava a edição em que foi dada; colunas da aba `Respostas` nunca são apagadas.
 
-## O painel do workshop
+## Painel
 
-Organizado na mesma sequência: **Escutar → Diagnosticar → Verificar → Direcionar → Roteiro do workshop**.
+Indicadores, uma seção por etapa, **gráficos de pizza** nas perguntas de escolha única (com opção de ver em barras), barras de 100% nas escalas, estrelas, halteres *declarado × realidade*, relatos, links e materiais enviados. Filtros por USF, função e tempo (grupos com menos de 3 respostas ficam ocultos), CSV, link da planilha e modo apresentação.
 
-- **Indicadores:** respostas, equipe sem orientação adaptada ao território, segurança para reconhecer agravos (declarada × no caso concreto) e falta de fluxo combinado.
-- **Gráficos:** barras de 100% para as escalas, barras ordenadas para escolhas, gráfico de halteres para as lacunas declarado × realidade e os relatos livres. Todo gráfico tem *Ver tabela*.
-- **Filtros** por função e tempo de atuação (e por unidade, se houver mais de uma). Grupos com menos de 3 respostas ficam indisponíveis para preservar o anonimato.
-- **Roteiro do workshop gerado pelas respostas**, pronto para copiar ou imprimir:
-  1. **Devolutiva (10 min):** maior lacuna, agravos, grupos e barreiras mais citados.
-  2. **Atualização científica direcionada (15 min):** temas em ordem de prioridade = % que pediu o tema + metade da lacuna (em pontos percentuais) do par ligado a ele.
-  3. **Cocriação do semifolder (25 min):** as 4 seções do semifolder já preenchidas com os focos que a equipe apontou, com perguntas para a discussão.
-  4. **Encaminhamentos (10 min):** as 4 entregas (workshop replicável, folder, banner/cartaz, outro material), materiais e canais mais pedidos e formato preferido.
-- **Modo apresentação** para projetar no encontro (esconde botões, filtros e relatos livres), **CSV**, link da **planilha** e **Copiar link do formulário**.
+## Tópicos do workshop
+
+26 tópicos em 5 blocos (entender o fenômeno, agravos do calor, quem precisa de atenção especial, realidade do território e a unidade na onda de calor), destrinchados com foco no Recife: calor, tempo mais seco, falta de água e comida mais cara. Cada tópico tem resumo, pontos-chave, *como dizer para a população*, foco no Recife, materiais-fonte e **gatilhos** que ligam o tópico às respostas.
+
+- **Essenciais** (7) sempre entram no workshop.
+- **Prioridade:** para a USF escolhida, cada gatilho vira um sinal (`% de respostas × peso/3`) e os sinais se somam num índice de necessidade de 0 a 100. Os mais altos abrem o roteiro; os essenciais que não aparecem entre eles entram em revisão breve; os demais ficam como material de apoio.
+- Tópicos e materiais ficam nas abas `Topicos` e `Materiais` e podem ser editados lá ou no app. Os destrinchamentos citam as fontes cadastradas em `Materiais`; ao incluir materiais novos, ligue-os aos tópicos pelo código.
+- Formato dos gatilhos: `r1_temas=hidratacao*3; v3_barreiras=agua; v4_orientar_real<=2` (códigos na aba `Perguntas`).
+
+## Roteiro do Workshop + Material Diagnóstico
+
+Na aba **Roteiro**, escolha a USF: o app monta o documento dizendo que o workshop foi construído a partir das necessidades da equipe, com o diagnóstico, a ordem dos tópicos, o material pré-workshop (material geral, 2 vídeos e 1 e-book, opcionais), as perguntas que a equipe pediu para pesquisarmos e os materiais que ela enviou. Dá para copiar, imprimir em PDF ou **publicar um link** para a equipe. Os links dos 2 vídeos e do e-book são cadastrados em `Materiais` (`V01`, `V02`, `E01`, uso `pre_workshop`).
 
 ## Instalação do servidor (uma vez, com a conta dona da planilha)
 
-1. Crie uma planilha Google nova (ex.: *El Niño · Escuta da UBS — respostas*) e deixe o compartilhamento como **Restrito**. O app continua funcionando, porque o Apps Script roda com a sua conta.
-2. Na planilha, abra **Extensões → Apps Script**. Crie dois arquivos de script e cole o conteúdo da pasta [`apps-script/`](apps-script): `Config.gs` e `Codigo.gs`. Apague o `Código.gs` vazio que vem por padrão.
-3. Selecione a função **`configurarElNino`**, clique em **Executar** e autorize.
-   - Ela cria as abas `Respostas`, `Acessos`, `Parametros`, `Dicionario`, `Auditoria` e `Instrucoes` e **não apaga nada**.
-   - O login `coordenacao` e uma senha aleatória aparecem no registro de execução e na aba **Acessos**.
-4. **Implantar → Nova implantação → App da Web**
-   - *Executar como:* **Eu**
-   - *Quem pode acessar:* **Qualquer pessoa** (o formulário é público e anônimo; o painel exige login)
-   - Copie a URL que termina em **`/exec`**.
-5. No GitHub, edite `index.html`, procure `const API_URL = '';` e cole a URL entre as aspas. Faça o commit.
-   Também dá para informar a URL em *Configuração do servidor*, na tela de login do painel. Nesse caso ela vale só para aquele navegador.
-6. Teste: responda o formulário pelo GitHub Pages e abra o painel com o login da coordenação.
+A planilha-banco já existe no Drive (Estudio-IA › 20-Medicina › Em-foco › *ElNino-Escuta-USF - banco de dados*).
 
-> **Contas institucionais (@upe.br):** o administrador do Google Workspace pode bloquear a opção "Qualquer pessoa". Se ela não aparecer, use uma conta Gmail pessoal como dona da planilha e do script.
+1. Abra a planilha → **Extensões → Apps Script**.
+2. Apague o conteúdo de `Código.gs` e cole o arquivo [`apps-script/Codigo.gs`](apps-script/Codigo.gs) inteiro. Salve.
+3. Escolha a função **`configurarElNino`** → **Executar** → autorize. Ela cria as abas e grava o questionário (edição 1), os 26 tópicos e os materiais. Os acessos `admin` e `coordenacao` aparecem na aba **Acessos** (troque as senhas ali quando quiser).
+4. **Implantar → Nova implantação → App da Web** · Executar como: **Eu** · Quem pode acessar: **Qualquer pessoa** → copie a URL `/exec`.
+5. No GitHub, em `index.html`, cole a URL em `const API_URL = '';`.
 
-### Atualizar depois
+Depois: para atualizar o servidor, cole o código novo e use *Implantar → Gerenciar implantações → editar → Nova versão* (a URL não muda). `verificarElNino()` mostra o estado sem alterar nada.
 
-- **Interface (`index.html`):** basta fazer o commit. Para o link `/exec` mostrar a mudança na hora, execute `atualizarInterfaceElNino()` no editor.
-- **Servidor (`.gs`):** cole o código novo e vá em *Implantar → Gerenciar implantações → editar (lápis) → Versão: Nova versão*. Assim a URL `/exec` não muda.
-- `verificarElNino()` mostra o estado da conexão sem alterar dados.
+## Planilha-banco
 
-## Uso
+| Aba | Conteúdo |
+|---|---|
+| Respostas | uma linha por pessoa: `id_resposta, recebido_em, usf, edicao, modo (oficial/validacao), origem, duracao_seg, request_id` + uma coluna por pergunta |
+| Versoes · Historico_Questionario · Perguntas | edições publicadas, o que mudou em cada uma e o dicionário da edição atual |
+| Comentarios | comentários de validação por pergunta ou etapa |
+| Topicos · Materiais | banco de tópicos e de fontes (inclui links e arquivos enviados pelas equipes, com situação *a revisar*) |
+| Diagnosticos | Materiais Diagnósticos publicados |
+| Parametros | `MODO_VALIDACAO`, `FORM_ABERTO`, `UBS_PADRAO`, `USFS`, `PASTA_UPLOADS_ID` |
+| Acessos · Auditoria (laranja) | logins (perfil `admin` ou `coordenacao`) e registro de acessos. Mantenha a planilha com compartilhamento Restrito |
 
-- **Link para a equipe:** `https://catarinamaia-codigom.github.io/UBS-el-nino-workshop/?ubs=Nome%20da%20UBS`. O nome aparece no formulário e é gravado com cada resposta. Sem `?ubs=`, vale `UBS_PADRAO` da aba *Parametros*.
-- **Replicar em outra UBS:** use o mesmo link com outro `?ubs=`. O painel ganha o filtro *Unidade*.
-- **Encerrar o formulário:** na aba *Parametros*, escreva `não` em `FORM_ABERTO`.
-- **Acessos:** troque a senha ou escreva `não` em `ativo` na aba *Acessos*; a sessão aberta cai na hora.
-- **Mudar perguntas:** edite `ETAPAS` no `index.html` e aumente `FORM_VERSAO`. Cada resposta grava a versão, e o painel atualiza a aba *Dicionario* (código → texto da pergunta e das opções) no próximo login.
-
-## Planilha
-
-`Respostas` tem uma linha por pessoa: `id_resposta`, `recebido_em`, `unidade`, `versao_form`, `origem`, `duracao_seg`, `request_id` e uma coluna por pergunta (criada sozinha no primeiro envio). Múltipla escolha fica como códigos separados por ` | `; o significado está em `Dicionario`. Textos que começam com `=`, `+`, `-` ou `@` são gravados como texto, nunca como fórmula. Reenvios do mesmo aparelho não duplicam linhas (`request_id`).
-
-Abas em laranja guardam credenciais ou registros de acesso. Não apague linhas para corrigir dados.
+Os arquivos enviados pelo formulário vão para a pasta *El Niño · materiais enviados pelas equipes*, ao lado da planilha, e ficam privados.
 
 ## Ética e anonimato
 
-O formulário não coleta identificação, não avalia profissionais individualmente e avisa para não citar nomes nos textos livres. Mesmo assim, em equipes pequenas, função + tempo de atuação podem identificar alguém: por isso o painel esconde recortes com menos de 3 respostas e o modo apresentação oculta os relatos livres. Revise os relatos antes de projetar. Se a proposta for virar pesquisa com publicação de resultados, verifique a necessidade de submissão ao Comitê de Ética.
+Sem nome, e-mail ou telefone; recortes com menos de 3 respostas ficam ocultos; o modo apresentação esconde relatos; o material público só mostra dados agregados e não mostra os arquivos enviados pelas equipes. Revise relatos antes de projetar. Se os resultados forem publicados como pesquisa, verifique a necessidade de submissão ao Comitê de Ética.
 
-## Arquivos
+## Fontes dos tópicos
 
-| Arquivo | Conteúdo |
-|---|---|
-| `index.html` | formulário, painel e roteiro (arquivo único, imagens embutidas) |
-| `apps-script/Config.gs` | endereços, nome padrão da UBS e limites |
-| `apps-script/Codigo.gs` | API (enviar, login, resultados, dicionário), configuração da planilha |
-| `sw.js` | guarda a página para reabrir sem internet no GitHub Pages |
+Ministério da Saúde (página Calor; Notas Técnicas 18/2023-SVSA e 38/2023-SAPS; Guia de bolso Mudanças Climáticas para Profissionais da Saúde; Painel de Excesso de Calor), SES-RJ (guia para ACS, 2025), SES-MG (hipoclorito 2,5%), Prefeitura de Porto Alegre (NT 1/2026, ACS e ACE), Prefeitura de São Paulo (idosos em calor e tempo seco) e boletins de 2026 sobre o El Niño (Inpe, APAC, Defesa Civil de PE, plano do Ministério da Saúde para o Nordeste). Links completos na aba `Materiais`.
