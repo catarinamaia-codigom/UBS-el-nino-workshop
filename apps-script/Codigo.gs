@@ -22,7 +22,7 @@
 /* ============================== CONFIGURAÇÃO ============================== */
 
 /** Versão do servidor. */
-const ELN_VERSAO = '2.0';
+const ELN_VERSAO = '3.0';
 
 /** Nome exibido no título da planilha e nas mensagens. */
 const ELN_TITULO = 'EL NIÑO É PAUTA DE SAÚDE — ESCUTA DA USF';
@@ -628,7 +628,7 @@ function elnResultados_(req) {
 }
 function elnParametrosSalvar_(req) {
   const acc = elnAuth_(req.token, 'admin');
-  elnSetParametro_('MODO_VALIDACAO', req.modo_validacao ? 'sim' : 'não', 'sim = versão DEMO para validação (balão de comentário para todos; respostas marcadas como validação).');
+  elnSetParametro_('MODO_VALIDACAO', req.modo_validacao ? 'sim' : 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).');
   elnSetParametro_('FORM_ABERTO', req.form_aberto === false ? 'não' : 'sim', 'não = encerra o recebimento de respostas.');
   if (req.ubs_padrao !== undefined) elnSetParametro_('UBS_PADRAO', elnClean_(req.ubs_padrao, 120) || ELN_UBS_PADRAO, 'Nome da unidade quando o link não traz ?ubs=Nome.');
   if (Array.isArray(req.usfs)) elnSetParametro_('USFS', req.usfs.map(s => elnClean_(s, 120)).filter(String).slice(0, 200).join('\n'), 'USFs sugeridas no formulário (uma por linha).');
@@ -664,13 +664,13 @@ function configurarElNino() {
   });
   const p = elnParametros_();
   const def = [['UBS_PADRAO', ELN_UBS_PADRAO, 'Nome da unidade quando o link não traz ?ubs=Nome.'], ['FORM_ABERTO', 'sim', 'não = encerra o recebimento de respostas.'],
-    ['MODO_VALIDACAO', 'sim', 'sim = versão DEMO para validação (balão de comentário para todos; respostas marcadas como validação).'], ['USFS', '', 'USFs sugeridas no formulário (uma por linha).']];
+    ['MODO_VALIDACAO', 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).'], ['USFS', '', 'USFs sugeridas no formulário (uma por linha).']];
   def.forEach(d => { if (!(d[0] in p)) elnAppendObj_(ELN_ABAS.PARAM, {chave: d[0], valor: d[1], descricao: d[2]}); });
   /* dados iniciais: só entram se as abas estiverem vazias */
   const agora = elnNow_();
   if (!elnRows_(ELN_ABAS.VERS).some(v => v.json)) {
     const qz = JSON.parse(JSON.stringify(ELN_SEED.questionario)); qz.edicao = 1;
-    elnAppendObj_(ELN_ABAS.VERS, {edicao: 1, publicado_em: agora, publicado_por: 'configuração', nota: 'Edição inicial (versão DEMO para validação)', json: JSON.stringify(qz)});
+    elnAppendObj_(ELN_ABAS.VERS, {edicao: 1, publicado_em: agora, publicado_por: 'configuração', nota: 'Edição inicial (versão oficial)', json: JSON.stringify(qz)});
     elnAba_(ELN_ABAS.HIST).appendRow([agora, 1, 'configuração', '', 'PUBLICADA', 'Edição inicial publicada']);
     CacheService.getScriptCache().remove('eln_qz');
     elnEscreveDicionario_(qz);
