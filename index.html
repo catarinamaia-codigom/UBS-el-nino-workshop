@@ -18,7 +18,7 @@
 <meta name="color-scheme" content="light">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=DM+Serif+Display:ital@0;1&family=Noto+Serif+Display:wdth,wght@62.5..100,300..500&display=swap" rel="stylesheet">
 <style>
 
 :root{
@@ -650,7 +650,7 @@ body.pitch-on{overflow:hidden;background:#1c1414}
 }
 
 /* tipografia */
-.pk-t{font-family:var(--serif);font-weight:400;text-transform:uppercase;line-height:.98;margin:0;letter-spacing:.004em;text-shadow:0 3px 4px rgba(0,0,0,.13);color:#141212}
+.pk-t{font-family:'Noto Serif Display',var(--serif);font-weight:420;font-stretch:78%;text-transform:uppercase;line-height:.98;margin:0;letter-spacing:0;text-shadow:0 3px 4px rgba(0,0,0,.13);color:#141212}
 .pk-t.r{color:#8b0c11}
 .pk-t u{text-decoration-thickness:5px;text-underline-offset:9px}
 .pk-rule{position:absolute;height:7px;width:100px;border-radius:4px;background:linear-gradient(90deg,#8b0c11,#b81c24)}
@@ -668,7 +668,7 @@ body.pitch-on{overflow:hidden;background:#1c1414}
 
 /* faixa vermelha inclinada */
 .pk-rib{position:absolute;display:grid;place-items:center;text-align:center;color:#fff;background:linear-gradient(100deg,#7d0d12 0%,#a4161d 38%,#b81d24 62%,#9c141b 100%);border-radius:34px 44px 30px 46px;box-shadow:0 22px 34px rgba(110,10,14,.28),inset 0 -8px 18px rgba(0,0,0,.2),inset 0 6px 12px rgba(255,255,255,.08);transform:rotate(var(--rot,-5deg)) skewX(-5deg);font-style:italic;line-height:1.18}
-.pk-rib>div{transform:skewX(5deg)}
+.pk-rib>div{transform:none}
 .pk-rib b{font-weight:800}
 .pk-rib .u{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
 .pk-spark{position:absolute;width:62px;height:62px}
@@ -719,7 +719,7 @@ body.pitch-on{overflow:hidden;background:#1c1414}
 /* slide 4 */
 .s4 .passo{position:absolute;top:172px;width:330px;text-align:center}
 .s4 .passo .pk-ic{width:108px;height:108px}
-.s4 .passo h4{margin:12px 0 2px;font:400 46px/1 var(--serif);color:#a4161d;letter-spacing:.01em}
+.s4 .passo h4{margin:12px 0 2px;font:420 50px/1 'Noto Serif Display',var(--serif);font-stretch:80%;color:#a4161d;letter-spacing:.01em}
 .s4 .passo p{margin:0;font:400 25.5px/1.2 var(--sans)}
 .s4 .liga{position:absolute;top:247px;height:2.4px;background:#a4161d}
 .s4 .liga::after{content:'';position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#a4161d;transform:translate(-50%,-50%)}
