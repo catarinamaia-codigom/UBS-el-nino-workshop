@@ -1,7 +1,7 @@
 /* El Niño · Escuta da UBS — service worker: guarda a última versão da página para abrir sem internet.
    Sempre tenta a rede primeiro (atualizações chegam normalmente); só usa a cópia quando não há conexão.
    Não intercepta chamadas ao servidor (Apps Script). */
-const CACHE = 'elnino-escuta-v2';
+const CACHE = 'elnino-escuta-v3';
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.add(new Request('./', {cache: 'reload'}))).catch(() => {})); });
 self.addEventListener('activate', e => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k !== CACHE) await caches.delete(k); await self.clients.claim(); })()); });
 self.addEventListener('fetch', e => {

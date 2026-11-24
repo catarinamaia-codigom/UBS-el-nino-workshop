@@ -10,11 +10,24 @@ GitHub Pages (index.html) ──fetch──┐
 Apps Script /exec (mesmo HTML) ────┘                                         └─► Pasta do Drive (arquivos enviados)
 ```
 
-- **Formulário:** https://catarinamaia-codigom.github.io/UBS-el-nino-workshop/ (para uma unidade: `?ubs=USF%20Nome`)
+- **Formulário (versão oficial, já gravando na planilha):** https://catarinamaia-codigom.github.io/UBS-el-nino-workshop/ (para uma unidade: `?ubs=USF%20Nome`)
+- **Apresentação do pitch:** botão **Apresentação** no topo, ou direto em `#apresentacao` (também `?apresentacao`). São 7 slides refeitos em HTML a partir do pitch; o último leva à pesquisa.
 - **Coordenação:** ícone de usuário no topo → login → Painel, Tópicos, Roteiro e (para administradores) Montagem.
 - **Material geral público dos tópicos:** `?topicos=1`
 - **Material Diagnóstico publicado para uma equipe:** `?diagnostico=<código>` (gerado na aba Roteiro)
 - Sem o servidor conectado, tudo funciona em **modo demonstração** (dados fictícios, nada gravado na planilha).
+
+## Apresentação (pitch)
+
+| Ação | Como |
+|---|---|
+| Avançar / voltar | setas do teclado, espaço, clique (à direita avança, à esquerda volta) ou deslizar no celular |
+| Tela cheia | botão ⛶ ou tecla **F** |
+| Notas de fala | botão **Notas** ou tecla **N** (só aparecem para quem apresenta, na tela) |
+| Ir para a pesquisa | botão vermelho da barra ou **Entrar na pesquisa** no último slide |
+| Sair | **Esc** ou ✕ |
+
+O slide *Como imaginamos o workshop* tem o **semifolder interativo**: setas reordenam, o lápis edita o texto, a lixeira remove e os focos à direita entram na lista (até 4). Tudo volta ao padrão ao sair do slide.
 
 ## O formulário (edição 1)
 
@@ -27,7 +40,7 @@ Apps Script /exec (mesmo HTML) ────┘                                  
 | **4. Direcionar** | temas, materiais, linguagem, canais e formato do encontro |
 | **5. Cocriar** | link de site ou matéria, **envio de arquivo** (até 3, 10 MB), **pergunta para a equipe UPE pesquisar** e um pedido ao workshop |
 
-**Versão DEMO para validação:** com `MODO_VALIDACAO = sim` (aba Parametros ou botão na Montagem), cada pergunta e cada etapa ganha um **balão de comentário**. A coordenadora responde, comenta e as respostas dessa fase ficam marcadas como `validacao` (o painel não as conta, a menos que se peça). Os comentários aparecem na Montagem para serem resolvidos.
+**Modo de validação** (desligado na versão oficial): com `MODO_VALIDACAO = sim` (aba Parametros ou botão na Montagem), cada pergunta e cada etapa ganha um **balão de comentário**. A coordenadora responde, comenta e as respostas dessa fase ficam marcadas como `validacao` (o painel não as conta, a menos que se peça). Os comentários aparecem na Montagem para serem resolvidos.
 
 ## Montagem do questionário (administração)
 
