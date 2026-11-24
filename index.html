@@ -1566,11 +1566,11 @@ function appnav(){
     h('a', {href:'#' + v, class:S.view === v || (v === 'form' && (S.view === 'inicio' || S.view === 'enviado')) ? 'on' : null, onclick:e => { e.preventDefault(); ir(v); }}, icon(ic), t,
       v === 'montagem' && abertos ? h('span', {class:'badge'}, abertos) : null)));
 }
-function ir(v){
+function ir(v, manter){
   const hash = v === 'form' || v === 'inicio' ? '' : '#' + v;
   try{ history.replaceState(null, '', location.pathname + location.search + hash); }catch(e){}
   if (v === 'form'){ S.view = 'inicio'; render(); return; }
-  if (v === 'apresentacao'){ S.view = 'pitch'; render(); return; }
+  if (v === 'apresentacao'){ if (!manter) PITCH.i = 0; S.view = 'pitch'; render(); return; }
   if (['painel','topicos','roteiro','montagem'].includes(v) && !logado()){ abrirLogin(v); return; }
   if (v === 'montagem' && !ehAdmin()){ toast('A montagem é só para administradores.'); return; }
   S.view = v; render();
@@ -3185,7 +3185,7 @@ function render(manterScroll){
 }
 function rotaHash(){
   const v = (location.hash || '').replace('#', '');
-  if (['painel', 'topicos', 'roteiro', 'montagem', 'apresentacao'].includes(v)) ir(v);
+  if (['painel', 'topicos', 'roteiro', 'montagem', 'apresentacao'].includes(v)) ir(v, true);
 }
 async function iniciar(){
   lerUnidadeDaUrl();
