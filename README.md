@@ -17,6 +17,14 @@ Apps Script /exec (mesmo HTML) ────┘                                  
 - **Material Diagnóstico publicado para uma equipe:** `?diagnostico=<código>` (gerado na aba Roteiro)
 - Sem o servidor conectado, tudo funciona em **modo demonstração** (dados fictícios, nada gravado na planilha).
 
+## Quem já respondeu
+
+O formulário é anônimo: as respostas não têm nome. Para a coordenação saber quem participou, **depois de enviar** a pessoa pode registrar o nome numa **lista de participação separada** (aba `Participacao`: data, USF e nome, sem horário e em ordem alfabética, para não ligar nomes a respostas). Quem pulou essa etapa vê, ao abrir o link de novo no mesmo aparelho, o atalho *Registrar meu nome na lista de participação*.
+
+No **Painel**, a seção *Quem já participou* mostra cada USF recolhida: número de respostas, de nomes na lista e, se a equipe prevista estiver preenchida, a porcentagem. Toque na unidade para abrir os nomes.
+
+**Unidades:** o formulário já traz *USF Hélio Mendonça* e *USF Córrego da Bica* numa lista para escolher (com a opção *Outra unidade*). O administrador inclui, renomeia, reordena ou tira unidades e informa a equipe prevista em **Montagem → Unidades (USFs)**. Tirar uma unidade da lista não apaga respostas.
+
 ## Apresentação (pitch)
 
 | Ação | Como |

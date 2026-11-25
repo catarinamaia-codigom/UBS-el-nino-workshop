@@ -623,6 +623,58 @@ body:not(.apresentacao) .apresentar-sair{display:none}
   .topic{break-inside:avoid}
 }
 
+/* ---- participação por USF (painel) ---- */
+.part .plist{display:grid;gap:10px}
+.pusf{background:#fff;border:1.5px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden}
+.pusf summary{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) auto 150px 22px;gap:16px;align-items:center;padding:14px 18px;cursor:pointer}
+.pusf summary::-webkit-details-marker{display:none}
+.pusf summary:hover{background:var(--rose)}
+.pusf .nm{font-weight:800;color:var(--ink);font-size:16px}
+.pusf .nm small{font-weight:500;color:var(--muted);font-size:13px}
+.pusf .meta{font-size:14px;color:var(--ink2);white-space:nowrap}
+.pusf .meta b{color:var(--red);font-size:15px}
+.pusf .pbar{display:block;height:10px;border-radius:6px;background:var(--rose2);overflow:hidden}
+.pusf .pbar.vazio{background:transparent}
+.pusf .pbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--red-deep),var(--red-hi))}
+.pusf summary>svg{width:20px;height:20px;color:var(--muted);transition:transform .2s}
+.pusf[open] summary>svg{transform:rotate(180deg)}
+.pusf[open] summary{border-bottom:1px solid var(--line2)}
+.pusf>:not(summary){margin:12px 18px}
+.pusf>.btnrow{margin-bottom:16px}
+.pnomes{columns:2 220px;column-gap:28px;padding-left:24px;font-size:14.5px;color:var(--ink)}
+.pnomes li{break-inside:avoid;margin:0 0 7px}
+.pnomes{margin-top:14px!important}
+.pnomes li span{color:var(--muted);font-size:12.5px;margin-left:8px;font-variant-numeric:tabular-nums}
+@media (max-width:640px){
+  .pusf summary{grid-template-columns:minmax(0,1fr) 22px;gap:6px 10px}
+  .pusf .meta{grid-column:1;grid-row:2;white-space:normal}
+  .pusf .pbar{grid-column:1;grid-row:3}
+  .pusf .pbar.vazio{display:none}
+  .pusf summary>svg{grid-column:2;grid-row:1}
+}
+
+/* ---- lista de participação (depois do envio) ---- */
+.partform{margin:20px 0 8px;text-align:left;background:var(--rose);border:1.5px solid var(--rose2);border-radius:18px;padding:18px 18px 16px}
+.partform h3{margin:0 0 6px;font:400 22px/1.15 var(--serif);color:var(--red-deep)}
+.partform p{margin:0 0 12px;font-size:14.5px;line-height:1.45;color:var(--ink2)}
+.partform .row{display:flex;gap:10px;flex-wrap:wrap}
+.partform .row input{flex:1 1 220px;min-width:0}
+.partform .row .btn{flex:none}
+.partok{display:flex;gap:10px;align-items:center;text-align:left;margin:20px 0 8px;padding:14px 16px;border-radius:14px;background:#eaf5ef;color:#0d5c3f;font-size:14.5px;line-height:1.4}
+.partok svg{width:22px;height:22px;flex:none}
+.partmodal .partform,.partmodal .partok{margin:4px 0 0}
+
+/* ---- unidades (montagem) ---- */
+.unid{display:grid;grid-template-columns:minmax(0,1fr) 62px 34px 34px;gap:8px 6px;align-items:center;margin-bottom:8px;padding:10px;border:1px solid var(--line2);border-radius:14px;background:#fcfafa}
+.unid input[type=text]{grid-column:1/-1}
+.unid .lbl{font-size:13px;font-weight:600;color:var(--ink2)}
+.unid input[type=text]{padding:8px 10px;font-size:14px;border-radius:10px}
+.unid input[type=number]{width:100%;border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:8px 6px;font-size:14px;text-align:center;outline:none}
+.unid input[type=number]:focus{border-color:var(--red)}
+.iconbtn.sm{width:34px;height:34px;box-shadow:none}
+.iconbtn.sm svg{width:17px;height:17px}
+.iconbtn[disabled]{opacity:.35;cursor:default}
+
 /* =================== APRESENTAÇÃO (pitch) =================== */
 body.pitch-on{overflow:hidden;background:#1c1414}
 .pitch{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 90% at 50% 40%,#2a1d1d 0%,#140d0d 100%);overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
@@ -1243,6 +1295,8 @@ const TOPICOS_PADRAO = [
 const API_URL = 'https://script.google.com/macros/s/AKfycbxRyymABGLxlniiEUjdZ2OSXzRKLqy3VzeoH7wMPyadPoU-_RkNloDemwaVa86x_lkn/exec';
 /** Nome mostrado quando o link não traz ?ubs=Nome e o servidor não define UBS_PADRAO. */
 const UBS_PADRAO = 'USF parceira';
+const UNIDADES_PADRAO = [{nome:'USF Hélio Mendonça', equipe:''}, {nome:'USF Córrego da Bica', equipe:''}];
+function usarUnidades(lista){ const v = {}; S.unidades = (Array.isArray(lista) && lista.length ? lista : UNIDADES_PADRAO).map(u => typeof u === 'string' ? {nome:u, equipe:''} : {nome:String(u.nome || '').trim(), equipe:u.equipe || ''}).filter(u => { const k = u.nome.toLowerCase(); if (!u.nome || v[k]) return false; v[k] = 1; return true; }); S.usfs = S.unidades.map(u => u.nome); }
 /** Recortes do painel com menos respostas que isso ficam ocultos (anonimato). */
 const MIN_RECORTE = 3;
 /** Limite total dos anexos enviados pelo formulário. */
@@ -1382,7 +1436,7 @@ function api(op, data){
 /* ---------------------- ESTADO ---------------------- */
 const S = {
   view:'inicio', etapa:0, resp:{}, anexos:{}, inicio:null, erros:{}, pendente:false,
-  unidade: UBS_PADRAO, unidadeFixa:false, formAberto:true, modoValidacao:false, usfs:[], urlApp:'',
+  unidade: UBS_PADRAO, unidadeFixa:false, formAberto:true, modoValidacao:false, usfs:UNIDADES_PADRAO.map(u => u.nome), unidades:clone(UNIDADES_PADRAO), urlApp:'',
   sessao: null,                 /* {token, login, nome, perfil, demo} */
   coment:{lista:[], carregado:false, aberto:null},
   dados:{rows:[], carregado:false, carregando:false, erro:'', planilha:'', atualizado:null, incluirValidacao:false,
@@ -1652,7 +1706,8 @@ function telaInicio(){
             h('button', {class:'btn primary', onclick:comecar}, temRasc ? 'Continuar de onde parei' : 'Começar a responder', icon('seta')),
             temRasc ? h('button', {class:'btn', onclick:novo}, 'Começar do zero') : null,
             h('button', {class:'btn ghost', onclick:() => ir('apresentacao')}, icon('apresentacao'), 'Ver a apresentação do projeto')),
-          jaRespondeu && S.formAberto ? h('p', {class:'saving', style:{marginTop:'12px'}}, 'Este aparelho já enviou uma resposta. Se ele é compartilhado, outra pessoa pode responder normalmente.') : null,
+          jaRespondeu && S.formAberto ? h('p', {class:'saving', style:{marginTop:'12px'}}, 'Este aparelho já enviou uma resposta' + (LS.get('eln_minha_usf', '') ? ' (' + LS.get('eln_minha_usf', '') + ')' : '') + '. Se ele é compartilhado, outra pessoa pode responder normalmente.',
+            !LS.get('eln_participou', null) && !pend ? h('button', {type:'button', class:'linkbtn', onclick:() => { const m = modal(h('div', {class:'partmodal'}, cartaoParticipacao())); }}, ' Registrar meu nome na lista de participação') : null) : null,
           pend ? h('div', {class:'banner info', style:{marginTop:'14px'}}, icon('info'), pend + (pend > 1 ? ' respostas guardadas' : ' resposta guardada') + ' neste aparelho aguardando internet para envio.') : null
         ),
         h('div', {class:'mapcard', 'aria-hidden':'true'},
@@ -1799,6 +1854,24 @@ function campoPergunta(q, n){
     ta.addEventListener('input', () => { S.resp[q.id] = ta.value; cc.textContent = ta.value.length + '/800'; salvaRascunho(); });
     fs.append(ta, cc);
   }
+  else if (q.tipo === 'usf' && S.usfs.length){
+    const lista = S.usfs.slice();
+    const atual = S.resp[q.id] || (S.unidadeFixa ? S.unidade : '') || '';
+    if (atual && !S.resp[q.id]) S.resp[q.id] = atual;
+    const achada = lista.find(u => u.toLowerCase() === String(atual).trim().toLowerCase());
+    const outra = !!atual && !achada;
+    const sel = h('select', {class:'usfsel', 'aria-label':q.texto},
+      h('option', {value:''}, 'Selecione sua USF…'), lista.map(u => h('option', {value:u}, u)), h('option', {value:'__outra'}, 'Outra unidade (escrever o nome)'));
+    const inp = h('input', {type:'text', maxlength:'120', 'aria-label':'Nome da sua unidade', placeholder:'Escreva o nome da USF', autocomplete:'off', style:{marginTop:'10px'}});
+    sel.value = outra ? '__outra' : (achada || ''); inp.value = outra ? atual : ''; inp.hidden = !outra;
+    if (achada && S.resp[q.id] !== achada) S.resp[q.id] = achada;
+    sel.addEventListener('change', () => {
+      if (sel.value === '__outra'){ inp.hidden = false; S.resp[q.id] = inp.value; inp.focus(); }
+      else { inp.hidden = true; S.resp[q.id] = sel.value; }
+      onChange(); });
+    inp.addEventListener('input', () => { S.resp[q.id] = inp.value; onChange(); });
+    fs.append(sel, inp);
+  }
   else if (q.tipo === 'usf'){
     const dl = h('datalist', {id:'dl-' + q.id}, S.usfs.map(u => h('option', {value:u})));
     const inp = h('input', {type:'text', maxlength:'120', list:'dl-' + q.id, 'aria-label':q.texto, placeholder:'Ex.: USF Córrego da Bica', autocomplete:'off'});
@@ -1891,10 +1964,39 @@ function telaEnviado(){
         S.pendente
           ? h('div', {class:'banner info', style:{textAlign:'left', marginTop:'18px'}}, icon('info'), 'Sem conexão com o servidor agora. Sua resposta ficou guardada neste aparelho e será enviada sozinha quando a internet voltar: é só abrir este link de novo mais tarde.')
           : h('p', null, 'Sua resposta foi registrada de forma anônima. Ela entra na leitura que vai definir a ordem do workshop e os materiais.'),
+        S.pendente ? null : cartaoParticipacao(),
         h('div', {class:'formula', style:{marginTop:'8px'}}, icon('calendario'), '1 formulário → 1 encontro → resultados práticos'),
         h('p', null, 'Antes do encontro, a equipe recebe o Roteiro do Workshop com o material diagnóstico da sua unidade.'),
         h('button', {class:'btn', onclick:() => { S.view = 'inicio'; render(); }}, 'Voltar ao início'))),
     h('img', {class:'skyline', src:IMG.skyline, alt:''}));
+}
+
+/* Lista de participação: depois do envio, separada das respostas */
+function cartaoParticipacao(){
+  const usf = LS.get('eln_minha_usf', '') || S.unidade;
+  const ja = LS.get('eln_participou', null);
+  if (ja && ja.usf === usf) return h('div', {class:'partok'}, icon('check'), h('span', null, h('b', null, 'Participação registrada. '), (ja.nome ? ja.nome + ', seu' : 'Seu') + ' nome está na lista da ' + usf + '.'));
+  const nome = h('input', {type:'text', maxlength:'80', autocomplete:'name', placeholder:'Seu nome (como a equipe te conhece)', 'aria-label':'Seu nome para a lista de participação'});
+  const btn = h('button', {class:'btn primary', type:'submit'}, 'Registrar participação');
+  const msg = h('p', {class:'saving', role:'status', style:{margin:'8px 0 0'}});
+  const form = h('form', {class:'partform'},
+    h('h3', null, 'Marque que você participou'),
+    h('p', null, 'Assim a coordenação sabe quem da equipe já respondeu. ', h('b', null, 'Seu nome vai para uma lista separada, sem ligação com as suas respostas'), ', que continuam anônimas.'),
+    h('div', {class:'row'}, nome, btn), msg);
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const n = nome.value.trim().replace(/\s+/g, ' ');
+    if (n.length < 2){ msg.textContent = 'Escreva seu nome para registrar.'; nome.focus(); return; }
+    btn.disabled = true; msg.textContent = 'Registrando…';
+    const reg = {usf, nome:n};
+    try{
+      if (hasServer() && !demoAtivo()) await api('participar', reg);
+      else { const l = LS.get('eln_demo_part', []); if (!l.some(x => x.usf === usf && x.nome.toLowerCase() === n.toLowerCase())) l.push(Object.assign({data:new Date().toISOString().slice(0, 10)}, reg)); LS.set('eln_demo_part', l); }
+      LS.set('eln_participou', {usf, nome:n.split(' ')[0], data:new Date().toISOString()});
+      form.replaceWith(cartaoParticipacao());
+    }catch(err){ btn.disabled = false; msg.textContent = 'Não foi possível registrar agora (' + String(err.message || err) + '). Tente de novo em instantes.'; }
+  });
+  return form;
 }
 
 /* ---------------------- DADOS DO PAINEL ---------------------- */
@@ -1919,10 +2021,13 @@ async function carregaDados(forcar){
   try{
     if (demoAtivo()){
       D.rows = dadosDemo().concat(LS.get('eln_demo_respostas', []).map(normaliza));
+      D.part = participacaoDemo(D.rows).concat(LS.get('eln_demo_part', []));
     } else {
       const r = await api('resultados', {});
       D.rows = (r.linhas || []).map(normaliza);
       D.planilha = r.planilha_url || D.planilha;
+      D.part = r.participacao || [];
+      if (r.unidades) usarUnidades(r.unidades);
       if (r.questionario && r.questionario.edicao >= QZ.edicao) usarQuestionario(r.questionario);
       D.rows = D.rows.map(normaliza);
     }
@@ -1958,7 +2063,7 @@ function topN(rows, qid, k, excluir){ return distribuicao(rows, qid).itens.filte
 
 /* dados fictícios para demonstração (semente fixa → sempre os mesmos) */
 const PESOS_DEMO = {
-  usf_nome:[['USF Córrego da Bica', 14], ['USF Alto do Mandu', 12]],
+  usf_nome:[['USF Córrego da Bica', 14], ['USF Hélio Mendonça', 12]],
   funcao:[['acs', 9], ['enfermeiro', 3], ['tecnico_enf', 4], ['medico', 3], ['saude_bucal', 2], ['acolhimento', 2], ['gestao', 1], ['residente', 2]],
   tempo:[['ate1', 6], ['1a5', 10], ['mais5', 9]],
   d1_recebeu:[['treinamento', 3], ['material', 8], ['nao', 11], ['nao_sei', 3]],
@@ -2194,6 +2299,7 @@ function telaPainel(){
   if (!D.carregado){ w.append(h('div', {class:'loadingbox'}, D.erro ? 'Tente atualizar de novo.' : 'Carregando respostas…')); out.append(h('img', {class:'skyline', src:IMG.skyline, alt:''})); return out; }
 
   const secs = etapasAtivas().map(et => [String(et.num), et.nome, 's-' + et.id]).concat([['★', 'Pares declarado × realidade', 's-pares']]);
+  w.append(secParticipacao(D));
   w.append(h('nav', {class:'seqnav no-print', 'aria-label':'Sequência do painel'}, h('div', {class:'in'},
     secs.map(([n, t, id]) => h('a', {href:'#' + id, class:n === '★' ? 'star' : null, onclick:(e) => { e.preventDefault(); const el = document.getElementById(id); if (el) el.scrollIntoView({behavior:'smooth'}); }}, h('i', null, n), t)))));
 
@@ -2208,7 +2314,7 @@ function telaPainel(){
   w.append(h('div', {class:'filters no-present'},
     h('label', null, 'USF', selUsf), sel('funcao', 'Função'), sel('tempo', 'Tempo na unidade'),
     filtrado || f.usf !== 'all' ? h('button', {class:'btn sm', onclick:() => { f.usf = 'all'; f.funcao = 'all'; f.tempo = 'all'; render(true); }}, 'Limpar filtros') : null,
-    nVal ? h('label', {class:'check', style:{flexBasis:'100%', textTransform:'none', letterSpacing:'0', fontSize:'13px'}}, chkVal, 'Incluir as ' + nVal + ' respostas da fase de validação (DEMO)') : null,
+    nVal ? h('label', {class:'check', style:{flexBasis:'100%', textTransform:'none', letterSpacing:'0', fontSize:'13px'}}, chkVal, 'Incluir as ' + nVal + ' respostas da fase de validação e de teste') : null,
     h('p', {class:'note'}, 'Os filtros valem para tudo abaixo. Grupos com menos de ' + MIN_RECORTE + ' respostas ficam indisponíveis para preservar o anonimato.')));
 
   if (!all.length){ w.append(h('div', {class:'anon'}, h('b', null, 'Ainda não há respostas. '), 'Compartilhe o link do formulário com a equipe.')); out.append(h('img', {class:'skyline', src:IMG.skyline, alt:''})); return out; }
@@ -2247,6 +2353,45 @@ function telaPainel(){
   out.append(h('img', {class:'skyline', src:IMG.skyline, alt:''}));
   out.append(h('button', {class:'btn primary apresentar-sair no-print', onclick:() => document.body.classList.remove('apresentacao')}, 'Sair do modo apresentação'));
   return out;
+}
+
+/* ---------------------- PARTICIPAÇÃO POR USF ---------------------- */
+function participacaoDemo(rows){
+  const nomes = ['Ana Paula', 'Bruno', 'Carla', 'Daniela', 'Edson', 'Fabiana', 'Gilvan', 'Helena', 'Ivone', 'Josué', 'Kátia', 'Luciana', 'Marcos', 'Neide'];
+  const out = [];
+  [...new Set(rows.filter(r => r.modo !== 'validacao').map(r => r.usf))].forEach((u, k) => {
+    const n = Math.round(rows.filter(r => r.usf === u && r.modo !== 'validacao').length * 0.75);
+    for (let i = 0; i < n; i++) out.push({data:'2026-11-' + String(18 + (i % 6)).padStart(2, '0'), usf:u, nome:nomes[(i + k * 5) % nomes.length] + (i >= nomes.length ? ' ' + (i + 1) : '')});
+  });
+  return out;
+}
+function secParticipacao(D){
+  const norm = x => String(x || '').trim().toLowerCase();
+  const dc = d => { const m = String(d || '').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[3] + '/' + m[2] : ''; };
+  const oficiais = D.rows.filter(r => r.modo !== 'validacao');
+  const part = D.part || [];
+  const base = S.unidades.map(u => u.nome);
+  const extra = [...new Set(oficiais.map(r => r.usf).concat(part.map(p => p.usf)))].filter(u => u && !base.some(b => norm(b) === norm(u))).sort((a, b) => a.localeCompare(b, 'pt'));
+  const itens = base.concat(extra).map(u => {
+    const resp = oficiais.filter(r => norm(r.usf) === norm(u)).length;
+    const lista = part.filter(p => norm(p.usf) === norm(u)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
+    const cfg = S.unidades.find(x => norm(x.nome) === norm(u));
+    const eq = cfg ? +cfg.equipe || 0 : 0;
+    const pct = eq ? Math.min(100, Math.round(100 * resp / eq)) : 0;
+    return h('details', {class:'pusf'},
+      h('summary', null,
+        h('span', {class:'nm'}, u, cfg ? null : h('small', null, ' · fora da lista')),
+        h('span', {class:'meta'}, h('b', null, resp), (resp === 1 ? ' resposta' : ' respostas') + (eq ? ' de ' + eq + ' (' + pct + '%)' : ''), ' · ', h('b', null, lista.length), lista.length === 1 ? ' nome' : ' nomes'),
+        h('span', {class:'pbar' + (eq ? '' : ' vazio'), role:eq ? 'img' : null, 'aria-label':eq ? pct + '% da equipe prevista respondeu' : null}, eq ? h('i', {style:{width:pct + '%'}}) : null),
+        icon('baixo')),
+      lista.length ? h('ol', {class:'pnomes'}, lista.map(p => h('li', null, p.nome, h('span', null, dc(p.data))))) : h('p', {class:'saving'}, 'Ninguém registrou o nome ainda.'),
+      resp > lista.length ? h('p', {class:'note'}, (resp - lista.length) + (resp - lista.length === 1 ? ' resposta chegou sem nome na lista' : ' respostas chegaram sem nome na lista') + ': a pessoa respondeu, mas não marcou a participação.') : null,
+      linkFormulario() ? h('div', {class:'btnrow'}, h('button', {class:'btn sm', type:'button', onclick:() => copiar(linkFormulario(u))}, icon('link'), 'Copiar o link desta USF')) : null);
+  });
+  return h('section', {class:'sec part no-present', id:'s-participacao'},
+    secHead('✓', 'Quem já', 'participou', 'Toque na unidade para ver os nomes. Quem responde pode registrar o nome depois de enviar; essa lista fica separada das respostas, que continuam anônimas.'),
+    h('div', {class:'plist'}, itens),
+    ehAdmin() ? h('p', {class:'note'}, 'Para incluir outra USF ou informar o tamanho da equipe, use Montagem → Unidades.') : null);
 }
 
 /* ---------------------- BANCO: TÓPICOS E MATERIAIS ---------------------- */
@@ -2970,7 +3115,7 @@ function telaMontagem(){
       h('button', {class:'btn sm', onclick:() => preVisualizar()}, icon('olho'), 'Pré-visualizar'),
       mud ? h('button', {class:'btn sm ghost', onclick:() => { if (confirm('Descartar todas as mudanças do rascunho?')){ LS.del('eln_rascunho_qz'); S.rascunho = null; render(true); } }}, 'Descartar') : null),
     demoAtivo() ? h('p', {class:'saving'}, 'Modo demonstração: a edição fica só neste navegador.') : null));
-  side.append(painelParametros());
+  side.append(painelUnidades(), painelParametros());
   const abertos = S.coment.lista.filter(c => c.status !== 'resolvido');
   side.append(h('div', {class:'panel'}, h('h3', null, 'Comentários de validação (' + abertos.length + ' abertos)'),
     abertos.length ? h('div', {class:'hist'}, abertos.slice().reverse().map(c => h('div', null, h('b', null, (Q[c.alvo] ? Q[c.alvo].curto : c.alvo_texto || c.alvo) + ': '), c.comentario, h('br'), h('small', null, (c.autor || 'Sem nome') + ' · ' + dataBR(c.quando)),
@@ -3119,20 +3264,47 @@ function painelParametros(){
   const val = h('input', {type:'checkbox'}); val.checked = S.modoValidacao;
   const ab = h('input', {type:'checkbox'}); ab.checked = S.formAberto;
   const ubs = h('input', {type:'text', maxlength:'120', value:S.unidadeParam || ''});
-  const usfs = h('textarea', {maxlength:'2000', value:S.usfs.join('\n'), style:{minHeight:'70px', fontSize:'13.5px'}, placeholder:'Uma USF por linha (sugestões no formulário)'});
   const btn = h('button', {class:'btn sm', type:'button'}, 'Salvar parâmetros');
   btn.addEventListener('click', async () => {
-    const p = {modo_validacao:val.checked, form_aberto:ab.checked, ubs_padrao:ubs.value.trim(), usfs:usfs.value.split('\n').map(x => x.trim()).filter(Boolean)};
+    const p = {modo_validacao:val.checked, form_aberto:ab.checked, ubs_padrao:ubs.value.trim()};
     btn.disabled = true;
-    try{ if (demoAtivo()) LS.set('eln_demo_param', p); else await api('parametros_salvar', p);
-      S.modoValidacao = p.modo_validacao; S.formAberto = p.form_aberto; S.usfs = p.usfs; S.unidadeParam = p.ubs_padrao; if (!S.unidadeFixa && p.ubs_padrao) S.unidade = p.ubs_padrao; toast('Parâmetros salvos.'); render(true); }
+    try{ if (demoAtivo()) LS.set('eln_demo_param', Object.assign(LS.get('eln_demo_param', {}) || {}, p)); else await api('parametros_salvar', p);
+      S.modoValidacao = p.modo_validacao; S.formAberto = p.form_aberto; S.unidadeParam = p.ubs_padrao; if (!S.unidadeFixa && p.ubs_padrao) S.unidade = p.ubs_padrao; toast('Parâmetros salvos.'); render(true); }
     catch(e){ toast(String(e.message || e)); btn.disabled = false; }
   });
   return h('div', {class:'panel'}, h('h3', null, 'Parâmetros'),
     h('label', {class:'switch'}, h('span', null, 'Modo de validação', h('br'), h('small', {class:'saving'}, 'mostra o balão de comentário a todos; respostas marcadas como validação')), val),
     h('label', {class:'switch'}, h('span', null, 'Formulário aberto'), ab),
     h('label', {class:'field'}, h('span', null, 'Nome padrão da unidade'), ubs),
-    h('label', {class:'field'}, h('span', null, 'USFs sugeridas'), usfs), h('div', {class:'btnrow'}, btn));
+    h('div', {class:'btnrow'}, btn));
+}
+/* Unidades (USFs) que aparecem no formulário · equipe prevista alimenta o acompanhamento de participação */
+function painelUnidades(){
+  let lista = clone(S.unidades);
+  const corpo = h('div', {class:'unids'});
+  const btn = h('button', {class:'btn sm primary', type:'button'}, 'Salvar unidades');
+  const desenha = () => corpo.replaceChildren(...lista.map((u, i) => {
+    const nome = h('input', {type:'text', maxlength:'120', value:u.nome, 'aria-label':'Nome da unidade ' + (i + 1), placeholder:'USF …'});
+    const eq = h('input', {type:'number', min:'0', max:'999', inputmode:'numeric', value:u.equipe || '', 'aria-label':'Equipe prevista em ' + (u.nome || 'nova unidade'), placeholder:'—'});
+    nome.addEventListener('input', () => { u.nome = nome.value; });
+    eq.addEventListener('input', () => { u.equipe = eq.value ? Math.max(0, Math.min(999, Math.floor(+eq.value))) || '' : ''; });
+    const sobe = h('button', {class:'iconbtn sm', type:'button', title:'Subir', disabled:i === 0 ? true : null, onclick:() => { [lista[i - 1], lista[i]] = [lista[i], lista[i - 1]]; desenha(); }}, icon('cima'));
+    const tira = h('button', {class:'iconbtn sm', type:'button', title:'Tirar do formulário (as respostas continuam)', onclick:() => { lista.splice(i, 1); desenha(); }}, icon('lixo'));
+    return h('div', {class:'unid'}, nome, h('span', {class:'lbl'}, 'Equipe prevista'), eq, sobe, tira);
+  }));
+  desenha();
+  const add = h('button', {class:'btn sm', type:'button', onclick:() => { lista.push({nome:'', equipe:''}); desenha(); const ult = corpo.lastElementChild; if (ult) ult.querySelector('input').focus(); }}, '+ Incluir USF');
+  btn.addEventListener('click', async () => {
+    const limpa = lista.map(u => ({nome:String(u.nome || '').trim(), equipe:u.equipe || ''})).filter(u => u.nome);
+    if (!limpa.length){ toast('Deixe pelo menos uma unidade.'); return; }
+    btn.disabled = true;
+    try{ if (demoAtivo()) LS.set('eln_demo_param', Object.assign(LS.get('eln_demo_param', {}) || {}, {unidades:limpa})); else await api('parametros_salvar', {unidades:limpa});
+      usarUnidades(limpa); toast('Unidades salvas. O formulário já mostra a lista nova.'); render(true); }
+    catch(e){ toast(String(e.message || e)); btn.disabled = false; }
+  });
+  return h('div', {class:'panel'}, h('h3', null, 'Unidades (USFs)'),
+    h('p', {class:'saving', style:{margin:'0 0 10px'}}, 'Aparecem na lista do formulário. A equipe prevista (opcional) mostra no painel quantos já participaram.'),
+    corpo, h('div', {class:'btnrow'}, add, btn));
 }
 async function carregaHistorico(){
   if (demoAtivo()) return;
@@ -3196,7 +3368,7 @@ async function iniciar(){
   if (S.view === 'pitch' || (location.hash || '') === '#apresentacao') PITCH.i = +SS.get('eln_pitch_i', 0) || 0;
   if (demoAtivo() || !hasServer()){
     const qz = LS.get('eln_demo_qz', null); if (qz) usarQuestionario(qz);
-    const p = LS.get('eln_demo_param', null); if (p){ S.modoValidacao = !!p.modo_validacao; S.formAberto = p.form_aberto !== false; S.usfs = p.usfs || []; S.unidadeParam = p.ubs_padrao || ''; if (!S.unidadeFixa && p.ubs_padrao) S.unidade = p.ubs_padrao; }
+    const p = LS.get('eln_demo_param', null); if (p){ S.modoValidacao = !!p.modo_validacao; S.formAberto = p.form_aberto !== false; usarUnidades(p.unidades || p.usfs); S.unidadeParam = p.ubs_padrao || ''; if (!S.unidadeFixa && p.ubs_padrao) S.unidade = p.ubs_padrao; }
   }
   QZ_PUB = normalizaQz(QZ);
   render();
@@ -3218,7 +3390,7 @@ async function iniciar(){
     try{
       const ping = await api('ping', {token:''});
       if (!S.unidadeFixa && ping.ubs_padrao) S.unidade = ping.ubs_padrao;
-      S.unidadeParam = ping.ubs_padrao || ''; S.formAberto = ping.form_aberto !== false; S.modoValidacao = !!ping.modo_validacao; S.usfs = ping.usfs || []; S.urlApp = ping.url_app || '';
+      S.unidadeParam = ping.ubs_padrao || ''; S.formAberto = ping.form_aberto !== false; S.modoValidacao = !!ping.modo_validacao; usarUnidades(ping.unidades || ping.usfs); S.urlApp = ping.url_app || '';
       if (ping.questionario && ping.questionario.etapas && !(S.sessao && S.sessao.demo)){ usarQuestionario(ping.questionario); LS.set('eln_qz_cache', ping.questionario); QZ_PUB = normalizaQz(QZ); }
       if (S.view === 'inicio') render(true);
     }catch(e){ /* sem conexão: o formulário segue funcionando e guarda no aparelho */ }

@@ -22,7 +22,7 @@
 /* ============================== CONFIGURAÇÃO ============================== */
 
 /** Versão do servidor. */
-const ELN_VERSAO = '3.0';
+const ELN_VERSAO = '3.1';
 
 /** Nome exibido no título da planilha e nas mensagens. */
 const ELN_TITULO = 'EL NIÑO É PAUTA DE SAÚDE — ESCUTA DA USF';
@@ -53,7 +53,7 @@ const ELN_MAX_ANEXOS_MB = 10;
 const ELN_SECRET_PROP = 'ELN_SECRET_V1';
 const ELN_SS_PROP = 'ELN_SS_ID';
 const ELN_ABAS = {RESP: 'Respostas', VERS: 'Versoes', HIST: 'Historico_Questionario', PERG: 'Perguntas', COM: 'Comentarios', ACESSOS: 'Acessos',
-  TOP: 'Topicos', MAT: 'Materiais', DIAG: 'Diagnosticos', PARAM: 'Parametros', AUD: 'Auditoria', INSTR: 'Instrucoes'};
+  TOP: 'Topicos', MAT: 'Materiais', DIAG: 'Diagnosticos', PARAM: 'Parametros', AUD: 'Auditoria', INSTR: 'Instrucoes', PART: 'Participacao'};
 const ELN_CAB = {
   Respostas: ['id_resposta', 'recebido_em', 'usf', 'edicao', 'modo', 'origem', 'duracao_seg', 'request_id'],
   Versoes: ['edicao', 'publicado_em', 'publicado_por', 'nota', 'json'],
@@ -65,8 +65,11 @@ const ELN_CAB = {
   Materiais: ['id', 'titulo', 'tipo', 'url', 'descricao', 'uso', 'topicos', 'origem', 'usf', 'status', 'enviado_em', 'enviado_por'],
   Diagnosticos: ['id', 'usf', 'publicado_em', 'publicado_por', 'json'],
   Parametros: ['chave', 'valor', 'descricao'],
-  Auditoria: ['quando', 'login', 'acao', 'detalhe']
+  Auditoria: ['quando', 'login', 'acao', 'detalhe'],
+  Participacao: ['data', 'usf', 'nome']
 };
+/* Unidades que já aparecem no formulário (o administrador inclui outras na Montagem). */
+const ELN_USFS_PADRAO = ['USF Hélio Mendonça', 'USF Córrego da Bica'];
 const ELN_META = ELN_CAB.Respostas;
 const ELN_TIPOS = ['usf', 'estrelas', 'escala', 'unica', 'multipla', 'texto', 'link', 'arquivo'];
 const ELN_ICONES = ['perfil', 'escutar', 'diagnosticar', 'verificar', 'direcionar', 'cocriar', 'validar', 'ouvir'];
@@ -113,6 +116,7 @@ function elnRoute_(req) {
     case 'banco_pub': return elnBanco_(false);
     case 'diagnostico': return elnDiagnostico_(req);
     case 'login': return elnLogin_(req);
+    case 'participar': return elnParticipar_(req);
     /* coordenação */
     case 'sair': elnAuth_(req.token); return {ok: true};
     case 'resultados': return elnResultados_(req);
@@ -386,8 +390,42 @@ function elnPing_() {
   return {versao: ELN_VERSAO, titulo: ELN_TITULO, ubs_padrao: String(p.UBS_PADRAO || ELN_UBS_PADRAO),
     form_aberto: p.FORM_ABERTO === undefined || p.FORM_ABERTO === '' ? true : elnTrue_(p.FORM_ABERTO),
     modo_validacao: elnTrue_(p.MODO_VALIDACAO),
-    usfs: String(p.USFS || '').split(/[\n;]+/).map(s => s.trim()).filter(Boolean).slice(0, 200),
+    usfs: elnUnidades_(p).map(u => u.nome), unidades: elnUnidades_(p),
     url_app: elnUrlApp_(), questionario: elnQzAtual_()};
+}
+/** USFS na aba Parametros: uma por linha, no formato "Nome" ou "Nome | equipe prevista". */
+function elnUnidades_(p) {
+  const bruto = String((p || elnParametros_()).USFS || '').trim();
+  const linhas = bruto ? bruto.split(/[\n;]+/) : ELN_USFS_PADRAO;
+  const vistos = {};
+  return linhas.map(l => { const partes = String(l).split('|'); const nome = elnClean_(partes[0], 120); const n = Math.floor(Number(String(partes[1] || '').trim()));
+    return {nome: nome, equipe: n > 0 && n < 1000 ? n : ''}; })
+    .filter(u => { const k = u.nome.toLowerCase(); if (!u.nome || vistos[k]) return false; vistos[k] = 1; return true; }).slice(0, 200);
+}
+/** Lista de participação: separada das respostas (sem id, sem horário) e reordenada por USF e nome a cada registro,
+    para que a ordem das linhas não permita ligar um nome a uma resposta. */
+function elnParticipar_(req) {
+  const p = elnParametros_();
+  elnAssert_(p.FORM_ABERTO === undefined || p.FORM_ABERTO === '' || elnTrue_(p.FORM_ABERTO), 'O formulário está encerrado.');
+  const usf = elnClean_(req.usf, 120), nome = elnClean_(req.nome, 80).replace(/\n/g, ' ');
+  elnAssert_(usf, 'Informe a USF.');
+  elnAssert_(nome.length >= 2, 'Escreva seu nome.');
+  return elnLock_(() => {
+    const ss = elnSs_();
+    let sh = ss.getSheetByName(ELN_ABAS.PART);
+    if (!sh) { sh = ss.insertSheet(ELN_ABAS.PART); sh.getRange(1, 1, 1, ELN_CAB.Participacao.length).setValues([ELN_CAB.Participacao]); sh.setFrozenRows(1); }
+    const larg = ELN_CAB.Participacao.length;
+    const dados = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, larg).getValues() : [];
+    const chave = (u, n) => (String(u) + '|' + String(n)).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+    if (dados.some(r => chave(r[1], r[2]) === chave(usf, nome))) return {ok: true, ja: true};
+    dados.push([Utilities.formatDate(new Date(), 'America/Recife', 'yyyy-MM-dd'), usf, nome].map(elnCell_));
+    dados.sort((a, b) => String(a[1]).localeCompare(String(b[1]), 'pt') || String(a[2]).localeCompare(String(b[2]), 'pt'));
+    sh.getRange(2, 1, dados.length, larg).setValues(dados);
+    return {ok: true, ja: false};
+  });
+}
+function elnParticipacao_() {
+  return elnRows_(ELN_ABAS.PART).filter(r => String(r.nome || '').trim()).map(r => ({data: elnVal_(r.data), usf: String(r.usf || ''), nome: String(r.nome || '')}));
 }
 
 function elnPastaUploads_() {
@@ -623,16 +661,20 @@ function elnResultados_(req) {
   const linhas = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, cab.length).getValues() : [];
   return {
     linhas: linhas.filter(r => String(r[0] || '').trim()).map(r => { const o = {}; cab.forEach((c, i) => { if (c) o[c] = elnVal_(r[i]); }); return o; }),
-    total: linhas.length, login: acc.login, planilha_url: elnUrlPlanilha_(), url_app: elnUrlApp_(), questionario: elnQzAtual_()
+    total: linhas.length, login: acc.login, planilha_url: elnUrlPlanilha_(), url_app: elnUrlApp_(), questionario: elnQzAtual_(),
+    participacao: elnParticipacao_(), unidades: elnUnidades_()
   };
 }
 function elnParametrosSalvar_(req) {
   const acc = elnAuth_(req.token, 'admin');
-  elnSetParametro_('MODO_VALIDACAO', req.modo_validacao ? 'sim' : 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).');
-  elnSetParametro_('FORM_ABERTO', req.form_aberto === false ? 'não' : 'sim', 'não = encerra o recebimento de respostas.');
+  if (req.modo_validacao !== undefined) elnSetParametro_('MODO_VALIDACAO', req.modo_validacao ? 'sim' : 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).');
+  if (req.form_aberto !== undefined) elnSetParametro_('FORM_ABERTO', req.form_aberto === false ? 'não' : 'sim', 'não = encerra o recebimento de respostas.');
   if (req.ubs_padrao !== undefined) elnSetParametro_('UBS_PADRAO', elnClean_(req.ubs_padrao, 120) || ELN_UBS_PADRAO, 'Nome da unidade quando o link não traz ?ubs=Nome.');
-  if (Array.isArray(req.usfs)) elnSetParametro_('USFS', req.usfs.map(s => elnClean_(s, 120)).filter(String).slice(0, 200).join('\n'), 'USFs sugeridas no formulário (uma por linha).');
-  elnAuditoria_(acc.login, 'PARAMETROS', JSON.stringify({validacao: !!req.modo_validacao, aberto: req.form_aberto !== false}));
+  if (Array.isArray(req.unidades)) {
+    const linhas = req.unidades.slice(0, 200).map(u => { const nome = elnClean_(u && u.nome, 120).replace(/[|\n;]/g, ' ').trim(); const n = Math.floor(Number(u && u.equipe)); return nome ? nome + (n > 0 && n < 1000 ? ' | ' + n : '') : ''; }).filter(String);
+    elnSetParametro_('USFS', linhas.join('\n'), 'USFs do formulário, uma por linha: Nome | equipe prevista (opcional).');
+  } else if (Array.isArray(req.usfs)) elnSetParametro_('USFS', req.usfs.map(s => elnClean_(s, 120)).filter(String).slice(0, 200).join('\n'), 'USFs do formulário, uma por linha: Nome | equipe prevista (opcional).');
+  elnAuditoria_(acc.login, 'PARAMETROS', JSON.stringify({validacao: req.modo_validacao, aberto: req.form_aberto, unidades: Array.isArray(req.unidades) ? req.unidades.length : undefined}));
   return {ok: true};
 }
 
@@ -645,7 +687,7 @@ function configurarElNino() {
   const props = PropertiesService.getScriptProperties();
   props.setProperty(ELN_SS_PROP, ss.getId());
   if (!props.getProperty(ELN_SECRET_PROP)) props.setProperty(ELN_SECRET_PROP, Utilities.getUuid() + Utilities.getUuid());
-  const laranja = {Acessos: 1, Auditoria: 1};
+  const laranja = {Acessos: 1, Auditoria: 1, Participacao: 1};
   if (!ss.getSheetByName(ELN_ABAS.RESP)) {
     const primeira = ss.getSheets()[0];
     if (primeira && primeira.getLastRow() === 0 && /^(sheet|página|planilha|pagina)\s*1$/i.test(primeira.getName())) primeira.setName(ELN_ABAS.RESP);
@@ -664,8 +706,9 @@ function configurarElNino() {
   });
   const p = elnParametros_();
   const def = [['UBS_PADRAO', ELN_UBS_PADRAO, 'Nome da unidade quando o link não traz ?ubs=Nome.'], ['FORM_ABERTO', 'sim', 'não = encerra o recebimento de respostas.'],
-    ['MODO_VALIDACAO', 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).'], ['USFS', '', 'USFs sugeridas no formulário (uma por linha).']];
+    ['MODO_VALIDACAO', 'não', 'sim = modo de validação (balão de comentário para todos; respostas marcadas como validação e fora dos resultados).'], ['USFS', ELN_USFS_PADRAO.join('\n'), 'USFs sugeridas no formulário (uma por linha).']];
   def.forEach(d => { if (!(d[0] in p)) elnAppendObj_(ELN_ABAS.PARAM, {chave: d[0], valor: d[1], descricao: d[2]}); });
+  if ('USFS' in p && !String(p.USFS || '').trim()) elnSetParametro_('USFS', ELN_USFS_PADRAO.join('\n'), 'USFs do formulário, uma por linha: Nome | equipe prevista (opcional).');
   /* dados iniciais: só entram se as abas estiverem vazias */
   const agora = elnNow_();
   if (!elnRows_(ELN_ABAS.VERS).some(v => v.json)) {
@@ -703,8 +746,9 @@ function configurarElNino() {
     ['Topicos e Materiais: banco de tópicos do workshop e das fontes. Podem ser editados aqui ou no app.'],
     ['Diagnosticos: Materiais Diagnósticos publicados (links enviados às equipes).'],
     ['Acessos: login, senha e perfil (admin ou coordenacao). Mude a senha ou escreva "não" em ativo para encerrar o acesso (a sessão cai na hora).'],
-    ['Parametros: MODO_VALIDACAO (sim/não), FORM_ABERTO (sim/não), UBS_PADRAO e USFS.'],
-    ['Abas em laranja guardam credenciais ou registros de acesso. Mantenha a planilha com compartilhamento Restrito.'],
+    ['Parametros: MODO_VALIDACAO (sim/não), FORM_ABERTO (sim/não), UBS_PADRAO e USFS (uma USF por linha: Nome | equipe prevista).'],
+    ['Participacao: lista de quem registrou o nome depois de responder (data, USF e nome). Fica separada das respostas, sem horário e em ordem alfabética, para não ligar nomes a respostas.'],
+    ['Abas em laranja guardam credenciais, registros de acesso ou nomes. Mantenha a planilha com compartilhamento Restrito.'],
     ['Formulário: ' + ELN_GITHUB_PAGES_URL + ' · para outra unidade, acrescente ?ubs=Nome%20da%20USF ao link.'],
     ['Versão do servidor: ' + ELN_VERSAO]
   ];
