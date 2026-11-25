@@ -1770,7 +1770,8 @@ function campoPergunta(q, n){
   const leg = h('legend', null, h('span', {class:'lt'}, h('span', {class:'n'}, n), q.texto, q.obrig ? h('span', {class:'req', 'aria-hidden':'true'}, ' *') : null));
   if (podeComentar()) leg.append(botaoComentario(q.id, q.texto, fs));
   fs.append(leg);
-  if (q.ajuda) fs.append(h('p', {class:'help'}, q.ajuda));
+  const ajuda = q.tipo === 'usf' && S.usfs.length && /escreva o nome/i.test(q.ajuda || '') ? 'Escolha na lista. Se a sua unidade não estiver, escolha “Outra unidade” e escreva o nome.' : q.ajuda;
+  if (ajuda) fs.append(h('p', {class:'help'}, ajuda));
   const limpaErro = () => { delete S.erros[q.id]; fs.classList.remove('err'); const em = fs.querySelector('.errmsg'); if (em) em.remove(); };
   const onChange = () => { limpaErro(); salvaRascunho(); };
 
